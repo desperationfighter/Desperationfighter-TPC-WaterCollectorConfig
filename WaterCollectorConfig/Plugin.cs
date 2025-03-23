@@ -12,7 +12,7 @@ namespace WaterCollectorConfig
         public new static ManualLogSource Logger { get; private set; }
         public const string GUID = "Desperationfighter.TPC.WaterCollectorConfig";
         public const string Name = "Water Collector Config";
-        public const string Version = "1.0.0.0"; //Remmber to Update Assembly Version too !
+        public const string Version = "1.0.1.0"; //Remmber to Update Assembly Version too !
 
         public static ConfigEntry<bool> ModisActive;
         public static ConfigEntry<int> SkyWaterCollector_Interval;

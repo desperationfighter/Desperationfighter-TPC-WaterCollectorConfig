@@ -1,7 +1,5 @@
 ﻿using HarmonyLib;
 using SpaceCraft;
-using static UnityEngine.Awaitable;
-using System.Collections.ObjectModel;
 
 namespace WaterCollectorConfig.Patches
 {
@@ -9,6 +7,7 @@ namespace WaterCollectorConfig.Patches
     [HarmonyPatch(nameof(MachineGenerator.SetGeneratorInventory))]
     static class MachineGenerator_SetGeneratorInventory_Patch
     {
+        //normally you should only need post or prefix however i do both as on longterm runs you need to wait first cycle to adapt the new setting thats why i also use prefix. Maybe a bit ressource hungry???
         [HarmonyPostfix]
         static void Postfix(MachineGenerator __instance)
         {
@@ -23,6 +22,29 @@ namespace WaterCollectorConfig.Patches
             if (!Plugin.ModisActive.Value) return;
             if (!__instance.name.Contains("Water")) return;
 
+            Plugin.MyDebugLogger($"Postfix (MachineGenerator.SetGeneratorInventory) : Instance Name> {__instance.name}");
+            Plugin.MyDebugLogger($"Postfix (MachineGenerator.SetGeneratorInventory) : Intervall Spawn set to - {__instance.spawnEveryXSec} - before");
+
+            if (__instance.name.Contains("WaterCollector1"))
+            {
+                Plugin.MyDebugLogger($"Postfix (MachineGenerator.SetGeneratorInventory) : Set SkyWaterCollector_Interval Intervall");
+                __instance.spawnEveryXSec = Plugin.SkyWaterCollector_Interval.Value;
+            }
+            else if(__instance.name.Contains("WaterCollector2"))
+            {
+                Plugin.MyDebugLogger($"Postfix (MachineGenerator.SetGeneratorInventory) : Set LakeWaterCollector_Interval Intervall");
+                __instance.spawnEveryXSec = Plugin.LakeWaterCollector_Interval.Value;
+            }
+
+            Plugin.MyDebugLogger($"Postfix (MachineGenerator.SetGeneratorInventory) : Intervall Spawn set to - {__instance.spawnEveryXSec} - after");
+        }
+
+        [HarmonyPrefix]
+        static bool Prefix(MachineGenerator __instance)
+        {
+            if (!Plugin.ModisActive.Value) return true;
+            if (!__instance.name.Contains("Water")) return true;
+
             Plugin.MyDebugLogger($"prefix (MachineGenerator.SetGeneratorInventory) : Instance Name> {__instance.name}");
             Plugin.MyDebugLogger($"prefix (MachineGenerator.SetGeneratorInventory) : Intervall Spawn set to - {__instance.spawnEveryXSec} - before");
 
@@ -31,13 +53,15 @@ namespace WaterCollectorConfig.Patches
                 Plugin.MyDebugLogger($"prefix (MachineGenerator.SetGeneratorInventory) : Set SkyWaterCollector_Interval Intervall");
                 __instance.spawnEveryXSec = Plugin.SkyWaterCollector_Interval.Value;
             }
-            else if(__instance.name.Contains("WaterCollector2"))
+            else if (__instance.name.Contains("WaterCollector2"))
             {
                 Plugin.MyDebugLogger($"prefix (MachineGenerator.SetGeneratorInventory) : Set LakeWaterCollector_Interval Intervall");
                 __instance.spawnEveryXSec = Plugin.LakeWaterCollector_Interval.Value;
             }
 
             Plugin.MyDebugLogger($"prefix (MachineGenerator.SetGeneratorInventory) : Intervall Spawn set to - {__instance.spawnEveryXSec} - after");
+
+            return true;
         }
     }
 }
